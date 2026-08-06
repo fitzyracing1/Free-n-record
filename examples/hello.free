@@ -1,0 +1,7 @@
+# hello.free – minimal Free(n) task
+# Demonstrates the base case of a single task that runs when n >= 0
+
+task hello:
+  body: |
+    print("Hello from Free(n)")
+    context["greeting"] = "Hello Free(n)"

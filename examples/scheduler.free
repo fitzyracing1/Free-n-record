@@ -1,0 +1,17 @@
+# scheduler.free – dependency-aware tasks
+
+task load:
+  body: |
+    context["data"] = [1, 2, 3, 4, 5]
+
+task transform:
+  deps: load
+  n: 1
+  body: |
+    context["transformed"] = [x * 2 for x in context["data"]]
+
+task summarize:
+  deps: transform
+  body: |
+    context["summary"] = sum(context["transformed"])
+    print("Summary:", context["summary"])

@@ -1,0 +1,19 @@
+# distributed.free – conceptual multi-node pattern
+# Each "node" conceptually holds its own (n, i, context)
+
+task partition:
+  body: |
+    context["shards"] = split(context["input"], num_nodes)
+
+task map_shard:
+  deps: partition
+  n: 2
+  body: |
+    # In a real distributed runtime this would run on many nodes
+    context["partial"] = map(work, context["shards"])
+
+task reduce:
+  deps: map_shard
+  body: |
+    context["result"] = reduce(context["partial"])
+    print("Distributed result ready")

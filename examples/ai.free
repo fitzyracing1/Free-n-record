@@ -1,0 +1,20 @@
+# ai.free – AI-native task pattern under Free(n)
+
+task prepare_prompt:
+  body: |
+    context["prompt"] = build_prompt(context["user_input"])
+
+task infer:
+  deps: prepare_prompt
+  n: 3          # higher n → larger model / more tokens / higher temperature control
+  body: |
+    context["completion"] = model.generate(
+        context["prompt"],
+        intensity=n
+    )
+
+task critique:
+  deps: infer
+  body: |
+    context["score"] = evaluate(context["completion"])
+    # Adaptive feedback can later raise or lower n based on score
