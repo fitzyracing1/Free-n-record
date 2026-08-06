@@ -1,6 +1,6 @@
 # Free(n) Specification
 
-**Version 0.1.1 – Draft**
+**Version 0.1 – Draft**
 
 ## 1. Overview
 
@@ -15,24 +15,22 @@ State = (n, i, context)
 
 | Field     | Type          | Meaning |
 |-----------|---------------|---------|
-| `n`       | integer       | Control parameter (depth, priority, intensity, resource class). |
-| `i`       | non-negative integer | Monotonic iteration / step counter. Incremented after every successful step, including the free/base case. |
+| `n`       | integer       | Control parameter (depth, priority, intensity, resource class). Must satisfy `n >= 0` for normal execution. |
+| `i`       | non-negative integer | Monotonic iteration / step counter. Incremented after every successful task execution. |
 | `context` | map / object  | Arbitrary key-value store holding intermediate results, configuration, and feedback. |
 
-### Execution Rule (Unified)
+### Execution Rule
 
 ```
-if n <= 0:
-    # free / base case  ("If n <=0 then n* free n =i++")
-    result ← 1                  # multiplicative identity from original free_n
+if n >= 0:
+    execute(task, n, i, context)
     i ← i + 1
 else:
-    result ← execute(task, n, i, context)
-    i ← i + 1
-    # optional adaptive adjustment of n
+    # base / terminal case – runtime defined
+    terminate or reduce
 ```
 
-The base case still advances the global iteration counter. This keeps progress observable even when the control parameter has entered the free region.
+The runtime is free to interpret negative `n` as a termination or reduction signal.
 
 ## 3. Scheduler
 
@@ -86,11 +84,11 @@ The Scheduler enforces this rule strictly.
 
 ## 9. Feedback Loop
 
-After each successful step (including base case):
+After each successful execution:
 
 1. Result is stored in `context`
 2. `i` is incremented
-3. Optional adaptive function may adjust `n` based on observed cost, quality, or resource pressure
+3. Optional adaptive function may adjust `n` (increase, decrease, or leave unchanged) based on observed cost, quality, or resource pressure
 4. Scheduler is asked for the next ready Task
 
 This forms the core adaptive feedback loop of Free(n).
@@ -111,7 +109,7 @@ Plugins must respect the State model and the execution rule.
 A conforming Free(n) implementation:
 
 - Maintains a State of the form `(n, i, context)`
-- Obeys the unified execution rule and always increments `i` after a step
+- Obeys the `n >= 0` execution rule and increments `i` after each successful step
 - Provides a Scheduler that respects declared dependencies
 - Treats Tasks as the unit of work
 

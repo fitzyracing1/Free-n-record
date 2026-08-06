@@ -20,36 +20,14 @@ This simple recursive form already encodes the essential properties:
 
 The Free(n) Computing Platform generalizes that insight into a full execution model for arbitrary tasks.
 
-## Unified Rule (v0.1.1)
-
-The platform now makes the base case and the iteration counter explicit and consistent with the original spirit:
-
-```
-if n <= 0:
-    # free / base case
-    # "n * free_n" collapses to the multiplicative identity
-    result = 1
-    i = i + 1
-else:
-    execute(task, n, i, context)
-    i = i + 1
-    # optional adaptive adjustment of n
-```
-
-This is the meaning of the compact statement:
-
-**If n <= 0 then n * free_n = i++**
-
-When the control parameter hits the free/base region, the system still advances the global iteration counter `i` and returns the identity value that the original factorial used.
-
 ## From Factorial to Platform
 
-| Original free_n          | Platform Free(n)                          |
-|--------------------------|-------------------------------------------|
-| `n` = depth of recursion | `n` = resource / intensity control        |
-| base case `n <= 0` → 1   | base case `n <= 0` → result=1, i++        |
-| multiply & recurse       | execute task, always i++, then adapt      |
-| pure function            | stateful context + feedback loop          |
+| Original free_n          | Platform Free(n)                     |
+|--------------------------|--------------------------------------|
+| `n` = depth of recursion | `n` = resource / intensity control   |
+| base case `n <= 0`       | terminal when `n < 0` or graph done  |
+| multiply & recurse       | execute task, increment `i`, adapt   |
+| pure function            | stateful context + feedback loop     |
 
 The same spirit remains: **invest `n`, observe progress via `i`, adapt**.
 
@@ -67,7 +45,7 @@ It sits one layer above them as a *task and adaptation* protocol that those tech
 ## Design Invariants
 
 1. State is always `(n, i, context)`.
-2. Successful work (including the free/base case) always increments `i`.
+2. Successful work always increments `i`.
 3. Adaptation happens *after* a step, never inside the pure task body (unless the task itself is the adaptive policy).
 4. The protocol stays language-neutral.
 
