@@ -1,14 +1,15 @@
 # Free(n) Computing Platform
 
-**Adaptive. Iterative. Resource-aware.**
+**Base interaction format between quantum and classical computers.**  
+**Adaptive. Iterative. Resource-aware. Ready for Mars.**
 
-Free(n) is an open computing protocol and specification that treats every piece of work as a task executing under a simple, adaptive state model.
+Free(n) is an open computing protocol that treats every piece of work as a task under a single adaptive state model:
 
 ```
 State = (n, i, context)
 
 if n >= 0:
-    execute(n, i, context)
+    execute(task, n, i, context)   # classical or quantum
     i = i + 1
 ```
 
@@ -16,53 +17,55 @@ Everything is a task.
 Everything is iterative.  
 Everything adapts to the resources that are actually available.
 
+## Core Purpose
+
+Free(n) is intended as a **base interaction format** between classical and quantum computers.  
+The same State object carries parameters, measurement results, and control decisions across the classical–quantum boundary.  
+`n` maps naturally onto classical intensity *and* quantum circuit depth / shot count.
+
+This makes Free(n) especially suitable for constrained environments such as planetary surface systems (Mars), where power, thermal, radiation, and communication limits force continuous adaptation.
+
 ## Why Free(n) Exists
 
 Modern computing is fragmented across CPUs, GPUs, clouds, edge devices, AI accelerators, and emerging quantum hardware. Most systems force the programmer to manage this complexity explicitly.
 
 Free(n) provides a single, language-neutral abstraction:
 
-- **n** controls depth, priority, or resource intensity.
-- **i** is the monotonic iteration counter.
-- **context** carries all intermediate state and results.
+- **n** controls depth, priority, or resource intensity (classical *and* quantum).
+- **i** is the monotonic iteration / shot / step counter.
+- **context** carries all intermediate state and results between domains.
 
-The runtime is free to interpret `n` according to available hardware, power budget, latency requirements, or model size. The same task description can therefore run on a phone, a cluster, or a future quantum backend without rewriting the core logic.
+The runtime is free to interpret `n` according to available hardware, power budget, thermal headroom, latency, or coherence time. The same task description can therefore run on a phone, a Mars lander, a cluster, or a quantum co-processor without rewriting the core logic.
 
 ## Core Ideas
 
 | Concept              | Description |
 |----------------------|-------------|
-| Adaptive Execution   | The value of `n` is interpreted by the runtime against current resources. Higher `n` may mean deeper search, larger model, more parallel workers, or higher precision. |
-| Iterative Scheduling | Every successful step increments `i`. Progress is always measurable and deterministic. |
-| Resource-Aware       | The runtime (not the task author) decides how to map `n` onto CPUs, GPUs, memory, network, or specialized accelerators. |
-| AI-Native            | Tasks can be pure computation, neural inference, agent steps, or hybrid. The same state model applies. |
-| Distributed          | A Free(n) task graph can be partitioned across nodes; each node maintains its own `(n, i, context)` view. |
-| Future Quantum       | `n` can later abstract over quantum circuit depth or shot count while preserving the same protocol surface. |
-
-## Long-Term Vision
-
-Free(n) aims to become a lightweight, open standard in the same spirit as POSIX, OCI, or WebAssembly — a common substrate that many languages, runtimes, and hardware targets can share.
-
-Version 0.1 focuses on the specification and a minimal Python reference.  
-Version 1.0 will stabilize the task graph, dependency model, and plugin interface.  
-Later versions introduce native distributed runtime and quantum backend abstractions.
+| Adaptive Execution   | `n` is interpreted by the runtime against current resources. Higher `n` may mean deeper circuits, more shots, larger classical models, or higher precision. |
+| Iterative Scheduling | Every successful step increments `i`. Progress is always measurable. |
+| Resource-Aware       | The runtime (not the task author) maps `n` onto CPUs, GPUs, quantum backends, power, and thermal limits. |
+| Quantum–Classical    | Free(n) is the common conversation format between the two domains. |
+| Mars / Space Ready   | Designed from the start for extreme resource constraints. |
+| AI-Native            | Tasks can be pure computation, neural steps, agent actions, or hybrid. |
+| Distributed          | Task graphs can be partitioned; each node keeps its own `(n, i, context)` view. |
 
 ## Repository Layout
 
 ```
-README.md                 This file
-LICENSE                   MIT
+README.md
+LICENSE
 CONTRIBUTING.md
 CODE_OF_CONDUCT.md
 
 docs/
-  SPEC.md                 Formal specification
-  KERNEL.md               Core kernel concepts
-  RUNTIME.md              Runtime architecture
-  SCHEDULER.md            Scheduler design
-  LANGUAGE.md             .free task language
-  FREE-N.md               Deep dive on the Free(n) model
-  ROADMAP.md              Version plan
+  SPEC.md
+  KERNEL.md
+  RUNTIME.md
+  SCHEDULER.md
+  LANGUAGE.md
+  FREE-N.md
+  QUANTUM.md          ← quantum–classical interaction format
+  ROADMAP.md
 
 examples/
   hello.free
@@ -71,29 +74,35 @@ examples/
   ai.free
 
 runtime/
-  python/                 Minimal reference implementation
-  rust/                   Placeholder
-  cpp/                    Placeholder
-  javascript/             Placeholder
+  python/             Minimal reference
+  rust/  cpp/  javascript/   Placeholders
+
+mars/                 ← Base package for Mars
+  README.md
+  free_n_mars.py      Classical ↔ quantum demo under Free(n)
 
 reference/
-  specification.md        Canonical reference text
+  specification.md
 ```
 
-## Quick Start (Python Reference)
+## Quick Start
 
+**Core Python reference**
 ```bash
 cd runtime/python
-python -m free_n
+python free_n.py
 ```
 
-See `runtime/python/README.md` for details.
+**Mars base package (classical ↔ quantum)**
+```bash
+cd mars
+python free_n_mars.py
+```
 
 ## Status
 
-This repository is the official open specification for the Free(n) Computing Platform.
-
-Initial commit: **Initial Free(n) Computing Platform specification**
+This repository is the official open specification for the Free(n) Computing Platform.  
+Version 0.1 establishes the protocol and the first Mars-oriented base package.
 
 ## License
 
