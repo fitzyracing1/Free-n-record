@@ -1,6 +1,15 @@
 """
 Free(n) Computing Platform – Minimal Python Reference Runtime
-Version 0.1
+Version 0.1.1
+
+Unified rule:
+    if n <= 0:
+        # free / base case  ("If n <=0 then n* free n =i++")
+        result = 1
+        i = i + 1
+    else:
+        execute(task, n, i, context)
+        i = i + 1
 """
 
 from __future__ import annotations
@@ -62,12 +71,7 @@ class Scheduler:
 
 class Runtime:
     """
-    Minimal Free(n) Runtime.
-
-    Execution rule:
-        if n >= 0:
-            execute(task, n, i, context)
-            i = i + 1
+    Minimal Free(n) Runtime implementing the unified rule.
     """
 
     def __init__(self, initial_n: int = 0) -> None:
@@ -78,21 +82,26 @@ class Runtime:
         self.scheduler.register(task)
 
     def execute(self, task: Task) -> Any:
-        if self.state.n < 0:
-            return None
+        # Unified rule: base case still advances i
+        if self.state.n <= 0:
+            # "If n <=0 then n* free n =i++"
+            # multiplicative identity + iteration advance
+            result = 1
+            self.state.context[task.name] = result
+            self.scheduler.mark_completed(task.name)
+            self.state.i += 1
+            return result
+
         result = task.fn(self.state)
         self.state.context[task.name] = result
         self.scheduler.mark_completed(task.name)
         self.state.i += 1
-        # Optional adaptive step (identity by default)
-        # self.state.n = adaptive_policy(self.state)
+        # Optional adaptive step can go here
         return result
 
     def run(self, max_steps: int = 100) -> State:
         steps = 0
         while steps < max_steps:
-            if self.state.n < 0:
-                break
             task = self.scheduler.next(self.state)
             if task is None:
                 break
@@ -110,16 +119,16 @@ def _demo() -> None:
 
     def hello(state: State) -> str:
         msg = "Hello from Free(n)"
-        print(f"[i={state.i}] {msg}")
+        print(f"[n={state.n} i={state.i}] {msg}")
         return msg
 
     def work(state: State) -> int:
         value = state.n * 10 + state.i
-        print(f"[i={state.i}] work → {value}")
+        print(f"[n={state.n} i={state.i}] work → {value}")
         return value
 
     def finish(state: State) -> str:
-        print(f"[i={state.i}] finished with context={state.context}")
+        print(f"[n={state.n} i={state.i}] finished with context={state.context}")
         return "done"
 
     rt.register(Task("hello", hello))
@@ -128,6 +137,12 @@ def _demo() -> None:
 
     final = rt.run()
     print("Final state:", final)
+
+    # Demonstrate base case
+    print("\n--- Base case (n <= 0) ---")
+    rt2 = Runtime(initial_n=-1)
+    rt2.register(Task("base", lambda s: "should not run body"))
+    print(rt2.run())
 
 
 if __name__ == "__main__":
