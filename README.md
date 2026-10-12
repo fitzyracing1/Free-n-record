@@ -107,3 +107,8 @@ Version 0.1 establishes the protocol and the first Mars-oriented base package.
 ## License
 
 MIT © 2026 Joshua Almeida (fitzyracing1)
+
+## Documentation
+
+- In-repo docs: [docs/](docs/index.md)
+- Wiki: [https://github.com/fitzyracing1/Free-n-record/wiki](https://github.com/fitzyracing1/Free-n-record/wiki)
